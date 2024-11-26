@@ -11,7 +11,7 @@ class CircularMemory
     //missing some pre-conditions here
     requires 0 <= cap
     // not sure but this should insure the output 
-    ensures write_position == 0 && read_position == 0
+    ensures write_position == 0 && read_position == 0 && isFlipped == false
      
     {
       //TODO 
