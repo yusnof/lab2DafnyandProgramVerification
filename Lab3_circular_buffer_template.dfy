@@ -9,12 +9,11 @@ class CircularMemory
 
     constructor Init(cap : int) 
     //missing some pre-conditions here
-    requires 0 <= cap
+    requires 0 <= cap 
     // not sure but this should insure the output 
-    ensures write_position == 0 && read_position == 0 && isFlipped == false
+    ensures write_position == 0 && read_position == 0 && isFlipped == false && isEmpty() && !isFull()
      
     {
-      //TODO 
       cells := new int[cap];
       //puts the Read and Write both to index 0 
       read_position := 0; 
@@ -28,32 +27,57 @@ class CircularMemory
     predicate Valid() 
     reads this
     {
-    //TODO 
-    // Think of some constraints on: 
-     // 1. cells.Length?
-    // 2. write_position?
-    // 3. read_position?
-    cells.Length >= 0  //&& 0 <= write_position && 0 <= read_position; 
-    
+    cells.Length >= 0  && 0 <= write_position && 0 <= read_position 
     } 
+  
+  // A predicate indicating no more Read available
+  predicate isEmpty()
+  reads this
+  {
+  cells.Length >= 0 && !isFlipped && read_position == write_position
+  }
 
+  //A predicate indicating no more Write should be allowed
+  predicate isFull()
+    reads this
+  {
+  cells.Length >= 0 && isFlipped && read_position == write_position
+  }
+
+//this is not correct but will review this later 
   method Read() returns (isSuccess : bool, content : int)
     modifies this
-    requires Valid()
+    
+    requires Valid() && read_position < cells.Length 
     ensures  Valid()
-    ensures  isSuccess ==> true //TODO
+    ensures  isSuccess ==> true//read_position == read_position + 1 
     ensures !isSuccess ==> true //TODO
 
   {
-    if(isFlipped)
+   
+    if(!isFlipped)
     {
-      //TODO
+      isSuccess := true; 
+      content := cells[read_position]; 
+      read_position := read_position + 1 ;
+       if(read_position == write_position){
+      isFlipped := true; 
+    } 
+      
     }
-    else // not flipped
+    else // flipped
     {
-      //TODO
+     read_position := 0;  
+      content := cells[read_position];
+       if(read_position == write_position){
+      isFlipped := true; 
     }
-  }
+    isSuccess := true;
+    read_position := read_position + 1 ;
+    }
+    }
+   
+  
 
   method Write(input : int) returns (isSuccess : bool)
     modifies this
