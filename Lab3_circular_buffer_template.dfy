@@ -62,6 +62,7 @@ class CircularMemory
       }
 
     } else {
+      content := 0; 
       isSuccess := false;
     }
   }
